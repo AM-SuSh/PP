@@ -1,4 +1,6 @@
-# 多平台 AI 任务并行仪表盘
+# PP: Parallel Pasture
+
+多平台 AI 任务并行仪表盘
 
 并行操作多个 AI 编码助手（ZCode / Codex / Claude Code / JetBrains 全家桶 / Cursor）时，
 一眼看清每个会话在做什么、停了多久、是否被遗忘。
