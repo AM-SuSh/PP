@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多平台 AI 任务仪表盘</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot live"></span>
+      <h1>AI 任务并行仪表盘</h1>
+    </div>
+    <div class="topbar-right">
+      <span id="running-badges" class="running-badges"></span>
+      <span id="updated" class="updated"></span>
+      <button id="refresh-btn" class="ghost-btn" title="立即刷新">↻</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input id="filter" type="search" placeholder="按标题 / 项目路径筛选…" />
+    <label class="check"><input id="only-active" type="checkbox" /> 仅看活跃</label>
+    <label class="check"><input id="group-platform" type="checkbox" checked /> 按平台分组</label>
+  </div>
+
+  <main id="board"></main>
+
+  <div id="empty" class="empty hidden">暂无数据。请确认各平台已产生会话。</div>
+
+  <footer class="footer">
+    <span>会话级 = CLI 三家（含对话/工具统计） · 活动级 = JetBrains/Cursor（仅项目+进程，读不到 AI 对话）</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
