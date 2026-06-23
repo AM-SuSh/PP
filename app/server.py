@@ -76,11 +76,31 @@ class Aggregator:
         for c in collectors:
             sessions.extend(c._safe_collect())
 
+        # 默认只保留今日有活动的会话（用户需求：不要读取全部历史会话）
+        sessions = [s for s in sessions if _is_today(s.last_active_at)]
+
+        # 附带各平台路径配置状态，前端据此判断"该平台能否点击打开"
+        from . import config as config_mod
+        paths = config_mod.load()
+
         return {
             "generated_at": time.time(),
             "platforms_running": sorted(running),
+            "platform_paths": paths,
             "sessions": [s.to_dict() for s in sessions],
         }
+
+
+def _is_today(ts) -> bool:
+    """时间戳（秒）是否在今天（本地时区）。无时间戳视为不在今日。"""
+    import datetime as _dt
+    if ts is None:
+        return False
+    try:
+        d = _dt.datetime.fromtimestamp(float(ts))
+    except (TypeError, ValueError, OSError):
+        return False
+    return d.date() == _dt.datetime.now().date()
 
 
 aggregator = Aggregator()
@@ -96,6 +116,40 @@ def api_sessions():
 @app.get("/api/invalidate")
 def api_invalidate():
     aggregator.invalidate()
+    return jsonify({"ok": True})
+
+
+@app.post("/api/launch")
+def api_launch():
+    """点击卡片打开对应平台。body: {platform, project_path}。"""
+    from flask import request
+    from . import launcher
+    body = request.get_json(silent=True) or {}
+    platform = (body.get("platform") or "").strip()
+    project_path = (body.get("project_path") or "").strip()
+    if not platform:
+        return jsonify({"ok": False, "message": "缺少 platform"}), 400
+    return jsonify(launcher.launch(platform, project_path))
+
+
+@app.get("/api/config")
+def api_config_get():
+    """返回当前平台路径配置。"""
+    from . import config as config_mod
+    return jsonify(config_mod.load())
+
+
+@app.post("/api/config")
+def api_config_set():
+    """手动设置某平台路径。body: {platform, path}。"""
+    from flask import request
+    from . import config as config_mod
+    body = request.get_json(silent=True) or {}
+    platform = (body.get("platform") or "").strip()
+    path = (body.get("path") or "").strip()
+    if not platform or not path:
+        return jsonify({"ok": False, "message": "需要 platform 和 path"}), 400
+    config_mod.set_path(platform, path)
     return jsonify({"ok": True})
 
 

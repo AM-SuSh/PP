@@ -1,38 +1,81 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>多平台 AI 任务仪表盘</title>
+  <title>AI 任务并行仪表盘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="dot live"></span>
-      <h1>AI 任务并行仪表盘</h1>
-    </div>
-    <div class="topbar-right">
-      <span id="running-badges" class="running-badges"></span>
-      <span id="updated" class="updated"></span>
-      <button id="refresh-btn" class="ghost-btn" title="立即刷新">↻</button>
-    </div>
-  </header>
+  <div class="fixed-header">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/>
+            <rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>
+          </svg>
+        </span>
+        <div>
+          <h1>AI 任务并行仪表盘</h1>
+          <div class="subtitle">实时监控各平台 AI 会话进展</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="running-badges" class="running-badges"></span>
+        <span id="updated" class="updated"></span>
+        <button id="refresh-btn" class="icon-btn" title="立即刷新" aria-label="立即刷新">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        </button>
+      <button id="theme-btn" class="icon-btn" title="切换主题" aria-label="切换主题">
+        <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button id="settings-btn" class="icon-btn" title="平台路径设置" aria-label="平台路径设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      </div>
+    </header>
 
-  <div class="toolbar">
-    <input id="filter" type="search" placeholder="按标题 / 项目路径筛选…" />
-    <label class="check"><input id="only-active" type="checkbox" /> 仅看活跃</label>
-    <label class="check"><input id="group-platform" type="checkbox" checked /> 按平台分组</label>
+    <div class="toolbar">
+      <div class="search">
+        <span class="si" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <input id="filter" type="search" placeholder="按标题或项目路径筛选…" aria-label="筛选会话" />
+      </div>
+      <div class="chip-group" role="group" aria-label="筛选选项">
+        <span class="scope-tag">仅显示今日活动</span>
+        <button id="chip-active" class="chip" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5"/></svg>
+          仅看活跃
+        </button>
+        <button id="chip-stale" class="chip" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          可能被遗忘
+        </button>
+        <button id="chip-group" class="chip on" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          按平台分组
+        </button>
+      </div>
+    </div>
   </div>
+
+  <section id="stats-bar" class="stats-bar" aria-label="概览统计"></section>
 
   <main id="board"></main>
 
-  <div id="empty" class="empty hidden">暂无数据。请确认各平台已产生会话。</div>
+  <div id="empty" class="empty hidden">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <div>暂无数据。请确认各平台已产生会话。</div>
+  </div>
 
   <footer class="footer">
-    <span>会话级 = CLI 三家（含对话/工具统计） · 活动级 = JetBrains/Cursor（仅项目+进程，读不到 AI 对话）</span>
+    <span>会话级 = CLI 三家（ZCode/Codex/Claude，含对话与工具统计） · 活动级 = JetBrains/Cursor（仅项目+进程，读不到 AI 对话） · 状态由进程存活与最近活动推导</span>
   </footer>
 
+  <script src="logos.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
